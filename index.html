@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Buddy's Desktop Adventure</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -166,31 +166,6 @@
       position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;
       background: rgba(255,255,255,0.95); padding: 20px; border-radius: 10px; font-weight: bold; z-index: 20;
     }
-
-    /* NEW Puzzle Game Styles (updated) */
-    .puzzle-body { display: flex; gap: 20px; }
-    .puzzle-container {
-      width: 300px; height: 300px; display: grid; grid-template-columns: repeat(3, 1fr);
-      border: 2px solid #ccc; position: relative;
-    }
-    .puzzle-drop-zone {
-      width: 100px; height: 100px; border: 1px dashed #ddd; background-color: #f9f9f9;
-      position: relative; transition: box-shadow 0.15s;
-      background-size: 300% 300%; background-repeat: no-repeat; background-position: center center;
-      filter: grayscale(60%) brightness(1.15) contrast(0.85);
-    }
-    .puzzle-drop-zone.drag-over { box-shadow: inset 0 0 0 3px #4CAF50; }
-    .puzzle-drop-zone.filled { border: none; filter: none; }
-    .piece-container {
-      width: 110px; height: 300px; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; padding-right: 4px;
-    }
-    .puzzle-piece {
-      width: 100px; height: 100px; cursor: grab; background-size: 300% 300%; border: 1px solid #333;
-      transition: transform 0.2s, opacity 0.2s; background-repeat: no-repeat; background-position: center center; user-select: none;
-    }
-    .puzzle-piece.dragging { opacity: 0.6; transform: scale(1.06); }
-    .puzzle-piece.placed { cursor: default; }
-    #puzzle-win-message { text-align: center; font-size: 20px; font-weight: bold; color: #4CAF50; margin-top: 15px; display: none; }
   </style>
 </head>
 <body>
@@ -246,10 +221,10 @@
       <div class="icon-label">Achievements</div>
     </div>
 
-    <!-- NEW Puzzle Game Icon -->
-    <div class="desktop-icon" style="top: 150px; left: 250px;" onclick="openApp('puzzle')">
-      <div class="icon-image" style="background: #F9A826;">🧩</div>
-      <div class="icon-label">Buddy Puzzle</div>
+    <!-- NEW Math Game Icon (replaces Puzzle) -->
+    <div class="desktop-icon" style="top: 150px; left: 250px;" onclick="openApp('math')">
+      <div class="icon-image" style="background: #F9A826;">🔢</div>
+      <div class="icon-label">Math Challenge</div>
     </div>
 
     <!-- Buddy Pet -->
@@ -472,6 +447,7 @@
     </div>
   </div>
 
+  <!-- Coloring Book Window -->
   <div class="window" id="coloringWindow" style="top: 150px; left: 450px; width: 480px;">
     <div class="window-header">
       <div class="window-title">🖍️ Coloring Book</div>
@@ -510,6 +486,7 @@
     </div>
   </div>
 
+  <!-- Jump Game Window -->
   <div class="window" id="jumpgameWindow" style="top: 100px; left: 500px; width: 450px;">
     <div class="window-header">
       <div class="window-title">🎮 Princess Jump Adventure</div>
@@ -534,22 +511,47 @@
     </div>
   </div>
 
-  <!-- NEW Puzzle Game Window -->
-  <div class="window" id="puzzleWindow" style="top: 80px; left: 180px; width: 500px;">
+  <!-- NEW Math Game Window -->
+  <div class="window" id="mathWindow" style="top: 80px; left: 180px; width: 520px;">
     <div class="window-header">
-      <div class="window-title">🧩 Buddy's Jigsaw Puzzle</div>
-      <button class="close-btn" onclick="closeWindow('puzzleWindow')">&times;</button>
+      <div class="window-title">🔢 Buddy's Math Challenge</div>
+      <button class="close-btn" onclick="closeWindow('mathWindow')">&times;</button>
     </div>
     <div class="window-content">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-        <p>Drag the pieces to solve the puzzle!</p>
-        <button class="app-button" onclick="initializePuzzle()">Shuffle</button>
+      <p>Solve as many as you can! Streaks boost your score 🎯</p>
+
+      <div id="mathHUD" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:10px 0;">
+        <strong>Score:</strong> <span id="mathScore">0</span>
+        <strong style="margin-left:8px;">Streak:</strong> <span id="mathStreak">0</span>
+        <strong style="margin-left:8px;">Time:</strong> <span id="mathTime">60</span>s
+        <div style="margin-left:auto;">
+          <label style="font-weight:bold;">Difficulty:</label>
+          <select id="mathDiff" onchange="resetMathGame()" style="padding:6px 8px;border-radius:6px;border:1px solid #ddd;">
+            <option value="easy">Easy (+ −)</option>
+            <option value="medium">Medium (+ − ×)</option>
+            <option value="hard">Hard (+ − × ÷)</option>
+          </select>
+        </div>
       </div>
-      <div class="puzzle-body">
-        <div class="puzzle-container" id="puzzleContainer"></div>
-        <div class="piece-container" id="pieceContainer"></div>
+
+      <div id="mathCard" style="background:#fafafa;border:2px solid #eee;border-radius:12px;padding:18px;text-align:center;">
+        <div id="mathQuestion" style="font-size:28px;font-weight:bold;margin-bottom:14px;">3 + 4 = ?</div>
+        <div id="mathChoices" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;"></div>
       </div>
-      <div id="puzzle-win-message">🎉 You solved it! Great job! 🎉</div>
+
+      <div class="progress-bar"><div class="progress-fill" id="mathProgress"></div></div>
+      <p style="margin-top:8px;"><small>Correct answers: <span id="mathCorrect">0</span></small></p>
+
+      <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;">
+        <button class="app-button" onclick="startMathGame()" id="mathStartBtn">▶️ Start</button>
+        <button class="app-button" onclick="resetMathGame()">🔄 Reset</button>
+      </div>
+
+      <div id="mathEnd" style="display:none;text-align:center;margin-top:14px;">
+        <h3>Time!</h3>
+        <p>Final Score: <strong id="mathFinalScore">0</strong></p>
+        <button class="app-button" onclick="startMathGame()">Play Again</button>
+      </div>
     </div>
   </div>
 
@@ -557,9 +559,6 @@
 
   <!-- GLOBAL SCRIPT -->
   <script>
-    // Puzzle image source (uses your provided Googleusercontent link)
-    const PUZZLE_IMG_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIYAAABpCAIAAABwCc...R4AeycB6CdRZXHz5n7ahpJSAKJ1ASk15AQqogKolhWZG";
-
     // --- GLOBAL STATE ---
     let happiness = 70;
     let feedCount = 0;
@@ -607,7 +606,8 @@
         'food': 'foodWindow', 'typing': 'typingWindow', 'art': 'artWindow',
         'organize': 'organizeWindow', 'music': 'musicWindow', 'calculator': 'calculatorWindow',
         'photos': 'photosWindow', 'achievements': 'achievementsWindow', 'coloring': 'coloringWindow',
-        'jumpgame': 'jumpgameWindow', 'puzzle': 'puzzleWindow'
+        'jumpgame': 'jumpgameWindow',
+        'math': 'mathWindow'
       };
       const windowId = windows[appName];
       if (windowId) {
@@ -617,7 +617,7 @@
         else if (appName === 'achievements') displayAchievements();
         else if (appName === 'coloring') initializeColoring();
         else if (appName === 'jumpgame') initializeJumpGame();
-        else if (appName === 'puzzle') initializePuzzle();
+        else if (appName === 'math') initializeMathGame();
 
         addAchievement('app-opener', '🔧', 'App Explorer', 'Opened your first app!');
       }
@@ -644,7 +644,7 @@
       { id: 'photographer', icon: '📷', name: 'Photo Explorer', description: 'Viewed all photos!' },
       { id: 'window-master', icon: '🖥️', name: 'Window Expert', description: 'Closed 5 windows!' },
       { id: 'clicker', icon: '🖱️', name: 'Mouse Master', description: 'Pet Buddy 10 times!' },
-      { id: 'puzzle-master', icon: '🧩', name: 'Puzzle Master', description: 'Solved the Buddy Puzzle!' },
+      { id: 'math-whiz', icon: '🔢', name: 'Math Whiz', description: 'Score 20+ in Math Challenge!' },
       { id: 'keyboard-ninja', icon: '⌨️', name: 'Keyboard Ninja', description: 'Used a keyboard shortcut!' }
     ];
     function addAchievement(id, icon, name, description) {
@@ -970,91 +970,130 @@
       document.getElementById('jumpProgress').style.width = `${(starsCollected/15)*100}%`;
     }
 
-    // --- PUZZLE GAME (updated) ---
-    let piecesPlaced = 0;
-    function initializePuzzle() {
-      const puzzleContainer = document.getElementById('puzzleContainer');
-      const pieceContainer = document.getElementById('pieceContainer');
-      puzzleContainer.innerHTML = '';
-      pieceContainer.innerHTML = '';
-      document.getElementById('puzzle-win-message').style.display = 'none';
-      piecesPlaced = 0;
+    /************  MATH GAME  ************/
+    let mathTimer = null;
+    let mathTimeLeft = 60;
+    let mathScore = 0;
+    let mathStreak = 0;
+    let mathCorrect = 0;
+    let currentAnswer = null;
 
-      const size = 3;                // 3x3 grid
-      const stepPercent = 100 / (size - 1);  // 0%, 50%, 100%
-      const pieces = [];
-
-      for (let i = 0; i < size * size; i++) {
-        const row = Math.floor(i / size);
-        const col = i % size;
-        const posX = col * stepPercent;
-        const posY = row * stepPercent;
-
-        // Board drop zone with faint ghost of the correct crop
-        const dropZone = document.createElement('div');
-        dropZone.className = 'puzzle-drop-zone';
-        dropZone.dataset.id = String(i);
-        dropZone.style.backgroundImage = `url("${PUZZLE_IMG_URL}")`;
-        dropZone.style.backgroundPosition = `${posX}% ${posY}%`;
-
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-        dropZone.addEventListener('drop', onPuzzleDrop);
-
-        puzzleContainer.appendChild(dropZone);
-
-        // Draggable piece with matching crop
-        const piece = document.createElement('div');
-        piece.className = 'puzzle-piece';
-        piece.draggable = true;
-        piece.dataset.id = String(i);
-        piece.style.backgroundImage = `url("${PUZZLE_IMG_URL}")`;
-        piece.style.backgroundPosition = `${posX}% ${posY}%`;
-
-        piece.addEventListener('dragstart', (e) => {
-          e.dataTransfer.setData('text/plain', piece.dataset.id);
-          piece.classList.add('dragging');
-        });
-        piece.addEventListener('dragend', () => piece.classList.remove('dragging'));
-
-        pieces.push(piece);
-      }
-
-      // Shuffle and append to tray
-      pieces.sort(() => Math.random() - 0.5).forEach(p => pieceContainer.appendChild(p));
+    function initializeMathGame() {
+      resetMathGame();
+      renderMathQuestion();
     }
 
-    function onPuzzleDrop(e) {
-      e.preventDefault();
-      const dropZone = e.currentTarget;
-      dropZone.classList.remove('drag-over');
+    function startMathGame() {
+      clearInterval(mathTimer);
+      mathTimeLeft = 60;
+      mathScore = 0; mathStreak = 0; mathCorrect = 0;
+      updateMathHUD();
+      document.getElementById('mathEnd').style.display = 'none';
+      document.getElementById('mathStartBtn').textContent = '⏸️ Pause';
 
-      if (dropZone.classList.contains('filled')) return;
+      mathTimer = setInterval(() => {
+        mathTimeLeft--;
+        document.getElementById('mathTime').textContent = mathTimeLeft;
+        if (mathTimeLeft <= 0) endMathGame();
+      }, 1000);
 
-      const pieceId = e.dataTransfer.getData('text/plain');
-      const dropZoneId = dropZone.dataset.id;
-
-      if (pieceId === dropZoneId) {
-        const piece = document.querySelector(`.puzzle-piece[data-id="${pieceId}"]`);
-        if (!piece) return;
-
-        piece.draggable = false;
-        piece.classList.add('placed');
-        dropZone.classList.add('filled');
-        dropZone.appendChild(piece);
-
-        // make the piece fill the zone perfectly
-        piece.style.width = '100%';
-        piece.style.height = '100%';
-        piece.style.border = 'none';
-
-        piecesPlaced++;
-        if (piecesPlaced === 9) {
-          document.getElementById('puzzle-win-message').style.display = 'block';
-          addAchievement('puzzle-master', '🧩', 'Puzzle Master', 'Solved the Buddy Puzzle!');
-        }
-      }
+      renderMathQuestion();
     }
+
+    function endMathGame() {
+      clearInterval(mathTimer);
+      mathTimer = null;
+      document.getElementById('mathFinalScore').textContent = mathScore;
+      document.getElementById('mathEnd').style.display = 'block';
+      document.getElementById('mathStartBtn').textContent = '▶️ Start';
+      happiness = Math.min(100, happiness + Math.min(20, Math.floor(mathScore/2)));
+      updateHappiness();
+      if (mathScore >= 20) addAchievement('math-whiz', '🔢', 'Math Whiz', 'Score 20+ in Math Challenge!');
+    }
+
+    function resetMathGame() {
+      clearInterval(mathTimer);
+      mathTimer = null;
+      mathTimeLeft = 60;
+      mathScore = 0; mathStreak = 0; mathCorrect = 0;
+      document.getElementById('mathTime').textContent = mathTimeLeft;
+      updateMathHUD();
+      document.getElementById('mathEnd').style.display = 'none';
+      document.getElementById('mathStartBtn').textContent = '▶️ Start';
+      renderMathQuestion();
+    }
+
+    function updateMathHUD() {
+      document.getElementById('mathScore').textContent = mathScore;
+      document.getElementById('mathStreak').textContent = mathStreak;
+      document.getElementById('mathCorrect').textContent = mathCorrect;
+      document.getElementById('mathProgress').style.width =
+        `${Math.min(100, (mathCorrect / 20) * 100)}%`;
+    }
+
+    function renderMathQuestion() {
+      const diff = document.getElementById('mathDiff').value;
+      const { q, ans, choices } = makeProblem(diff);
+      currentAnswer = ans;
+
+      document.getElementById('mathQuestion').textContent = q;
+      const wrap = document.getElementById('mathChoices');
+      wrap.innerHTML = '';
+      choices.forEach(v => {
+        const btn = document.createElement('button');
+        btn.className = 'app-button';
+        btn.textContent = v;
+        btn.onclick = () => handleMathChoice(v);
+        wrap.appendChild(btn);
+      });
+    }
+
+    function handleMathChoice(value) {
+      const card = document.getElementById('mathCard');
+      if (value === currentAnswer) {
+        mathCorrect++;
+        mathStreak++;
+        mathScore += 1 + Math.min(5, Math.floor(mathStreak / 3)); // lil streak bonus
+        card.style.boxShadow = '0 0 0 3px #4CAF50 inset';
+        setTimeout(() => card.style.boxShadow = 'none', 250);
+      } else {
+        mathStreak = 0;
+        card.style.boxShadow = '0 0 0 3px #FF6B6B inset';
+        setTimeout(() => card.style.boxShadow = 'none', 250);
+      }
+      updateMathHUD();
+      renderMathQuestion();
+    }
+
+    function makeProblem(diff) {
+      // operators per difficulty
+      const ops = diff === 'easy' ? ['+','-']
+                 : diff === 'medium' ? ['+','-','*']
+                 : ['+','-','*','/'];
+      const op = ops[Math.floor(Math.random()*ops.length)];
+      let a = rand(1, 20), b = rand(1, 20);
+      let ans;
+
+      if (op === '+') ans = a + b;
+      else if (op === '-') { if (a < b) [a,b] = [b,a]; ans = a - b; }
+      else if (op === '*') { a = rand(2,12); b = rand(2,12); ans = a * b; }
+      else { // division - ensure whole number
+        ans = rand(2,12);
+        b = rand(2,12);
+        a = ans * b;
+      }
+
+      const q = `${a} ${op} ${b} = ?`;
+      const choices = new Set([ans]);
+      while (choices.size < 4) {
+        const noise = ans + rand(-10, 10);
+        if (noise >= -50 && noise <= 400) choices.add(noise);
+      }
+      // shuffle
+      const shuffled = Array.from(choices).sort(() => Math.random()-0.5);
+      return { q, ans, choices: shuffled };
+    }
+    function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
     // --- GLOBAL KEYBOARD LISTENER ---
     document.addEventListener('keydown', function(e) {
